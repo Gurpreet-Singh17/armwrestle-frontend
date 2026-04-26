@@ -14,11 +14,13 @@ export default function Match() {
       return;
     }
 
+    // ✅ PRODUCTION WebSocket (IMPORTANT CHANGE)
     const socket = new WebSocket(
-      `ws://127.0.0.1:8000/api/v1/ws/match/${userId}`
+      `wss://armwrestle-connect-backend.onrender.com/api/v1/ws/match/${userId}`
     );
 
     socket.onopen = () => {
+      console.log("Connected ✅");
       setConnected(true);
     };
 
@@ -27,8 +29,13 @@ export default function Match() {
     };
 
     socket.onclose = () => {
+      console.log("Connection closed ❌");
       setConnected(false);
-      alert("Connection closed ❌");
+    };
+
+    socket.onerror = (err) => {
+      console.log("WebSocket error", err);
+      alert("WebSocket error ❌");
     };
 
     setWs(socket);
@@ -39,6 +46,7 @@ export default function Match() {
       alert("WebSocket not connected ❌");
       return;
     }
+
     ws.send(msg);
   };
 
@@ -98,7 +106,7 @@ export default function Match() {
             onChange={(e) => setInput(e.target.value)}
             style={{ width: "100%", marginTop: "10px" }}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (e.key === "Enter" && input.trim()) {
                 send(input);
                 setInput("");
               }
